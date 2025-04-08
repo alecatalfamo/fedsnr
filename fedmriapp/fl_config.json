@@ -1,0 +1,25 @@
+{
+    "epochs": 5,
+    "numRounds": 30,
+    "batchSize": 16,
+    "splitServer": "172.16.5.71",
+    "splitPort": "5000",
+    "portFl": "8080",
+    "fitClients": 20,
+    "fitFraction": 0.7,
+    "strategy": "FedMRI",
+    "distribution": "dirichlet",
+    "strategySeed": 42,
+    "noisyClients": [
+        3,
+        0,
+        8,
+        7,
+        16,
+        2,
+        11,
+        1,
+        10,
+        17
+    ]
+}

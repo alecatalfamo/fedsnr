@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "FedMRI-app"
+version = "1.0.0"
+description = "Federated Learning with FedMRI strategy"
+license = "Apache-2.0"
+dependencies = [
+    "flwr[simulation]>=1.14.0",
+    "flwr-datasets[vision]>=0.3.0",
+    "torch==2.2.1",
+    "torchvision==0.17.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.flwr.app]
+publisher = "flwrlabs"
+
+[tool.flwr.app.components]
+serverapp = "fedmriapp.server_app:app"
+clientapp = "fedmriapp.client_app:app"
+
+[tool.flwr.federations]
+default = "local-simulation-gpu"
+
+[tool.flwr.federations.local-simulation]
+options.num-supernodes = 20
+
+[tool.flwr.federations.local-simulation-gpu]
+options.num-supernodes = 20
+options.backend.client-resources.num-cpus = 2 # each ClientApp assumes to use 2CPUs
+options.backend.client-resources.num-gpus = 0.5 # at most 5 ClientApp will run in a given GPU
