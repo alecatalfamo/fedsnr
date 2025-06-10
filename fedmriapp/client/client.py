@@ -9,8 +9,6 @@ import gc
 from collections import OrderedDict
 from flwr.common import GetPropertiesIns, GetPropertiesRes, Code
 
-from fedmriapp.mristrategy.average import calculate_dataset_snr_cnr
-
 def set_all_seeds(seed: int = 42):
     """Set seeds for all random number generators."""
     # Python random
@@ -30,10 +28,11 @@ def set_all_seeds(seed: int = 42):
 
 
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, dataloader):
+    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, learning_rate, dataloader):
         self.client_id = client_id
         set_all_seeds(42)
         self.model = model
+        self.learning_rate = learning_rate
         self.train_data = dataloader
         #print("Train data", self.train_data)
         self.mean_snr = float(mean_snr)
@@ -45,7 +44,7 @@ class FlowerClient(fl.client.NumPyClient):
     def get_parameters(self):
         return self.model.get_weights()
     
-    def set_parameters(self, parameters):
+    def  set_parameters(self, parameters):
         self.set_weights(parameters)
     
     def get_properties(self, config):
@@ -75,6 +74,8 @@ class FlowerClient(fl.client.NumPyClient):
     def train(self, model):
         set_all_seeds(42)
         # Training loop
+        self.optimizer = self.optimizer(model.parameters(), lr=self.learning_rate)
+        model.train()
         for epoch in range(self.num_epochs):
             running_loss = 0.0
             num_batches = len(self.train_data)

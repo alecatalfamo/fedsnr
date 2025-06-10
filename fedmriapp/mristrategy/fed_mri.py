@@ -58,36 +58,3 @@ class FedMRI(fl.server.strategy.FedAvg):
                 aggregated_ndarrays[i] += layer * scale
                 
         return aggregated_ndarrays
-    
-    # def aggregate_inplace(self, results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:
-            
-    #         # Count total examples
-    #         num_examples_total = sum(fit_res.num_examples for (_, fit_res) in results)
-    #         parameters_array = [fit_res.parameters for (_, fit_res) in results]
-    #         local_lengths = [fit_res.num_examples for _, fit_res in results]
-            
-    #         # Compute scaling factors for each result
-    #         scaling_factors = [
-    #             fit_res.num_examples / num_examples_total for _, fit_res in results
-    #         ]
-            
-    #         inverted_contrasts = [fit_res.metrics["mean_snr"] for _, fit_res in results]
-            
-    #         local_lengths = np.array(local_lengths)
-            
-    #         phi = np.max(inverted_contrasts)/np.max(local_lengths)
-    #         scale = [
-    #             (phi*local_lengths[i] * (inverted_contrasts[i])) / np.sum(phi*local_lengths * (inverted_contrasts))
-    #             for i in range(len(local_lengths))
-    #         ]
-            
-    #         parameters_array = [parameters_to_ndarrays(fit_res.parameters) for _, fit_res in results]
-
-    #         params = [
-    #             scale[0] * x for x in parameters_array[0]
-    #         ]
-    #         for i, local_parameters in enumerate(parameters_array[1:]):
-    #             for layer in range(len(params)):
-    #                 params[layer] += scale[i + 1] * local_parameters[layer]
-
-    #         return params

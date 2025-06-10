@@ -1,3 +1,5 @@
 partitions/
 *.ipynb
 fedmriapp/partitions/
+test-reproduction/partitions*
+fedmriapp/results

@@ -1,9 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from skimage import io
-from skimage.filters import threshold_otsu
-from skimage.morphology import closing, square, binary_erosion, remove_small_objects, footprint_rectangle
-from skimage.measure import label, regionprops
 from scipy.ndimage import gaussian_filter
 from skimage import filters
 

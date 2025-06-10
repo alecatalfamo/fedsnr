@@ -36,9 +36,11 @@ def set_all_seeds(seed: int = 42):
     os.environ['PYTHONHASHSEED'] = str(seed)
 
 # Set global configuration
-SERVER_SPLIT = '172.16.5.71'
+SERVER_SPLIT = 'localhost'
 PORT_FLASK = 5000
 FOLDER = Path(os.getcwd() + '/partitions')
+# DATASET = 'alzheimer'
+DATASET = 'braintumor'
 device = "cuda"
 
 with open('fedmriapp/fl_config.json') as fl_config_file:
@@ -61,7 +63,7 @@ def untar_file(file_path, folder_path):
     with zipfile.ZipFile(file_path, "r") as zip_ref:
         zip_ref.extractall(folder_path)
 
-def request_local_train_data(client_id, folder_path, noise=False):
+def request_local_train_data(client_id, folder_path,):
     """Request and save the partition data for a specific client."""
     # Set seed based on client_id for reproducible client-specific behavior
     set_all_seeds(42)
@@ -69,9 +71,9 @@ def request_local_train_data(client_id, folder_path, noise=False):
     print("Distribution used:", DISTRIBUTION)
     
     if DISTRIBUTION == 'iid':
-        url = f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions/{client_id}?noise=True' if noise else f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions/{client_id}'
+        url = f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions/{client_id}?dataset={DATASET}'
     elif DISTRIBUTION == 'dirichlet':
-        url = f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions-dirichlet/{client_id}?noise=True' if noise else f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions-dirichlet/{client_id}'
+        url = f'http://{SERVER_SPLIT}:{PORT_FLASK}/partitions-dirichlet/{client_id}?dataset={DATASET}'
     
     print("URL:", url)
     
@@ -103,7 +105,7 @@ class Grayscale:
 
 def apply_transforms(batch, noise_type='rician', noise_params=None):
     """Apply transformations to the image batch including noise."""
-    resize = Resize((208, 176))
+    resize = Resize((208, 176)) if DATASET == 'alzheimer' else Resize((244, 244))
     #resize = Resize((244,244))
     grayscale = Grayscale()
     transforms = ToTensor()
@@ -189,7 +191,7 @@ def client_fn(context: Context):
     
     # Get the optimizer class dynamically
     optimizer_class = getattr(torch.optim, client_config['optimizer'])
-    optimizer = optimizer_class(net.parameters(), lr=client_config['learningRate'])
+    optimizer = optimizer_class
     
     # Get DataLoader with fixed seed
     trainloader = get_data_loader(partition_id, batch_size=fl_config['batchSize'], noise_type=noise_type, noise_params=noisy_params)
@@ -201,7 +203,7 @@ def client_fn(context: Context):
     # with open('fedmriapp/results/client_loaded.txt', 'a') as f:
     #     f.write(f"Client {partition_id} loaded\n")
     
-    return FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, trainloader).to_client()
+    return FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
 
 # Set final seed before creating the ClientApp
 set_all_seeds(42)

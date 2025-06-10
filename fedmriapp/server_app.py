@@ -15,8 +15,11 @@ from fedmriapp.mristrategy.fed_mri import FedMRI
 from fedmriapp.reproducibility.reproducible_strategy import make_strategy_reproducible
 #from fedmriapp.client_app import apply_transforms
 
-TESTSET_PATH = "./fedmriapp/testset/test"
+#TESTSET_PATH = "./fedmriapp/testset/test"
 PATH = "./fedmriapp/results"
+
+#DATASET = 'alzheimer'
+DATASET = 'braintumor'
 
 with open('fedmriapp/fl_config.json') as f:
     fl_config = json.load(f)
@@ -79,7 +82,7 @@ class Grayscale:
 
 def apply_transforms(batch):
     """Apply transformations to the image batch."""    
-    resize = Resize((208, 176))
+    resize = Resize((208, 176)) if DATASET == 'alzheimer' else Resize((244, 244))
     #resize = Resize((244, 244))
     grayscale = Grayscale()
     transforms = ToTensor()
@@ -91,7 +94,7 @@ def apply_transforms(batch):
     return batch
 
 def get_testset():
-    dataset_path = Path("/home/fcr/client-mri/total_dataset")
+    dataset_path = Path("./datasets/global_datasets/alzheimer_dataset") if DATASET == 'alzheimer' else Path("./datasets/global_datasets/brain-tumor-mri")
     #dataset_path = Path("/home/fcr/client-mri/brain-tumor-mri")
     dataset = load_dataset('imagefolder', data_dir=dataset_path)
     test_dataset = dataset['test']

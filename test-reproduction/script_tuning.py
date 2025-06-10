@@ -3,6 +3,7 @@ import sys
 import argparse
 import random
 def modify_json(input_file, output_file, fitFraction, strategy, distribution, percentage_noisy_clients, fit_clients, seed):
+    print("Input file:", input_file)
     with open(input_file, 'r') as f:
         data = json.load(f)
     
