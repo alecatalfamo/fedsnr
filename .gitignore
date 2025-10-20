@@ -4,4 +4,4 @@ fedmriapp/partitions/
 test-reproduction/partitions*
 fedmriapp/results
 venv
-__pycache__
+**/__pycache__/
