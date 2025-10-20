@@ -1,2 +1,8 @@
 flask
-skimage
+scikit-image
+flwr
+datasets
+flwr-datasets
+torch
+flwr[simulation]
+torchvision
