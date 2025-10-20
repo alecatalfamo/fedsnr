@@ -40,8 +40,8 @@ SERVER_SPLIT = 'localhost'
 PORT_FLASK = 5000
 FOLDER = Path(os.getcwd() + '/partitions')
 # DATASET = 'alzheimer'
-DATASET = 'braintumor'
-device = "cuda"
+#DATASET = 'braintumor'
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 with open('fedmriapp/fl_config.json') as fl_config_file:
     fl_config = json.load(fl_config_file)
@@ -51,6 +51,7 @@ with open('fedmriapp/client/client_config.json') as client_config_file:
 
 DISTRIBUTION = fl_config['distribution']
 LIST_NOISY_CLIENTS = fl_config['noisyClients']
+DATASET = fl_config['dataset']
 
 # Set initial seeds
 set_all_seeds(42)

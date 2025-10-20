@@ -39,8 +39,8 @@ class FlowerClient(fl.client.NumPyClient):
         self.num_epochs = epochs
         self.criterion = criterion
         self.optimizer = optimizer
-        self.device = "cuda"
-
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+ 
     def get_parameters(self):
         return self.model.get_weights()
     
