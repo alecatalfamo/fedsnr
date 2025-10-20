@@ -12,6 +12,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Load configurations
+with open('fedmriapp/models/model_config.json') as f:
+    model_config = json.load(f)
+with open('fedmriapp/fl_config.json') as f:
+    fl_config = json.load(f)
+    
 def set_all_seeds(seed: int = 42):
     """Set seeds for all random number generators."""
     random.seed(seed)
@@ -23,9 +29,6 @@ def set_all_seeds(seed: int = 42):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-# Load configuration
-with open('fedmriapp/models/model_config.json') as f:
-    model_config = json.load(f)
 
 class CustomCNNLight(nn.Module):
     def __init__(self, seed: int = 42):
@@ -160,16 +163,17 @@ def get_custom_model(seed: int = 42):
     Returns:
         CustomCNNLight: Initialized model
     """
+    
     try:
         # Set seeds for reproducible model creation
         # set_all_seeds(seed)
         
         # Create model
-        model = TorchModel(seed=seed)
-        #model = CustomCNNLight(seed=seed)
+        #model = TorchModel(seed=seed)
+        model = CustomCNNLight(seed=seed) if fl_config['dataset'] == 'alzheimer' else TorchModel(seed=seed)
         
         # Move to device
-        device = torch.device(model_config['device'])
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         model = model.to(device)
         
         logger.info(f"Successfully created custom model with seed {seed}")
