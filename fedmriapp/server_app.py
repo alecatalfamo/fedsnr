@@ -19,13 +19,15 @@ from fedmriapp.reproducibility.reproducible_strategy import make_strategy_reprod
 PATH = "./fedmriapp/results"
 
 #DATASET = 'alzheimer'
-DATASET = 'braintumor'
+#DATASET = 'braintumor'
 
 with open('fedmriapp/fl_config.json') as f:
     fl_config = json.load(f)
 
 percentages = len(fl_config['noisyClients']) / fl_config['fitClients']
 result_file = f"{PATH}/{fl_config['strategy']}-C{fl_config['fitFraction']}-partClients{fl_config['fitClients']}-dist-{fl_config['distribution']}-perc-{percentages}.csv"
+
+DATASET = fl_config['dataset']
 
 def init_results_file():
     with open(result_file, "w") as f:
