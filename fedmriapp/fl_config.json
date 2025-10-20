@@ -8,7 +8,8 @@
     "fitClients": 30,
     "fitFraction": 0.7,
     "strategy": "FedMRI",
-    "distribution": "dirichlet",
+    "dataset": "alzheimer",
+    "distribution": "iid",
     "strategySeed": 42,
     "noisyClients": [
         20,
