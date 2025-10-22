@@ -136,9 +136,9 @@ class FlowerProxClient(fl.client.NumPyClient):
     def get_parameters(self):
         return self.model.get_weights()
     
-    def set_parameters(self, parameters):
-        self.set_weights(parameters)
-    
+    def set_parameters(self, model, parameters):
+        self.set_weights(model, parameters)
+
     def get_properties(self, config):
         properties = {
             "client_id": self.client_id,
@@ -152,7 +152,7 @@ class FlowerProxClient(fl.client.NumPyClient):
         self.set_parameters(self.global_model, parameters)
         
         # Imposta i parametri nel modello locale
-        self.set_parameters(parameters)
+        self.set_parameters(self.model, parameters)
         set_all_seeds(42)
         self.train_fedprox(self.model)
         
@@ -163,11 +163,11 @@ class FlowerProxClient(fl.client.NumPyClient):
         
         return [val.cpu().numpy() for _, val in self.model.state_dict().items()], len(self.train_data), metrics
     
-    def set_weights(self, parameters):
-        params_dict = zip(self.model.state_dict().keys(), parameters)
+    def set_weights(self, model, parameters):
+        params_dict = zip(model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
-        self.model.load_state_dict(state_dict, strict=True)
-    
+        model.load_state_dict(state_dict, strict=True)
+
     def train_fedprox(self, model):
         set_all_seeds(42)
         # Training loop con termine prossimale FedProx
