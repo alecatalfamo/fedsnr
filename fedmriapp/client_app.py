@@ -11,7 +11,7 @@ from datasets import load_from_disk
 from flwr.client import ClientApp, NumPyClient
 from flwr.common import Context
 
-from fedmriapp.client.client import FlowerClient
+from fedmriapp.client.client import FlowerClient, FlowerProxClient
 from fedmriapp.models.models import get_custom_model
 from fedmriapp.mristrategy.average import calculate_dataset_snr_cnr
 from fedmriapp.noise import AddGaussianNoise, AddRicianNoise, AddSaltPepperNoise
@@ -200,11 +200,18 @@ def client_fn(context: Context):
     # Calculate SNR/CNR with fixed seed
     set_all_seeds(42)
     mri_parameters = calculate_dataset_snr_cnr(trainloader)
+    clientsClass = {}
+    clientsClass['FedAvg'] = clientsClass['FedSNR'] = FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
+    clientsClass['FedProx'] = FlowerProxClient (partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
+    try:
+        client = clientsClass[fl_config['strategy']] 
+    except KeyError:
+        raise ValueError(f"Invalid Client respect to Strategy: {fl_config['strategy']}")
     
     # with open('fedmriapp/results/client_loaded.txt', 'a') as f:
     #     f.write(f"Client {partition_id} loaded\n")
-    
-    return FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
+
+    return client
 
 # Set final seed before creating the ClientApp
 set_all_seeds(42)

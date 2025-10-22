@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import json
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.common import Context, ndarrays_to_parameters, Metrics
-from flwr.server.strategy import FedAvg
+from flwr.server.strategy import FedAvg, FedProx
 from datasets import load_dataset
 from pathlib import Path
 from collections import OrderedDict
@@ -133,8 +133,9 @@ def server_fn(context: Context):
         batch_size=32,
         shuffle=False,
     )
-    
-    strategyFedAvg = FedAvg(
+    strategies = {}
+
+    strategies['FedAvg'] = FedAvg(
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
@@ -142,8 +143,8 @@ def server_fn(context: Context):
         initial_parameters=parameters_param,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
     )
-    
-    strategyFedSNR = FedSNR(
+
+    strategies['FedSNR'] = FedSNR(
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
@@ -151,12 +152,19 @@ def server_fn(context: Context):
         initial_parameters=parameters_param,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
     )
+    strategies['FedProx'] = FedProx(
+        fraction_fit=fl_config["fitFraction"],
+        fraction_evaluate=0,
+        min_available_clients=fl_config["fitClients"],
+        on_fit_config_fn=on_fit_config,
+        initial_parameters=parameters_param,
+        evaluate_fn=get_evaluate_fn(testloader, device=device),
+        proximal_mu=0.01,
+    )
     
-    if fl_config["strategy"] == "FedAvg":
-        strategy = strategyFedAvg
-    elif fl_config["strategy"] == "FedSNR":
-        strategy = strategyFedSNR
-    else:
+    try:
+        strategy = strategies[fl_config["strategy"]]
+    except KeyError:
         raise ValueError(f"Invalid strategy: {fl_config['strategy']}")
     
     strategy = make_strategy_reproducible(strategy, seed=fl_config["strategySeed"])
