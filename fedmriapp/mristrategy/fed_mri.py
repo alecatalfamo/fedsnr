@@ -18,8 +18,11 @@ from flwr.common import (
     ndarrays_to_parameters,
     parameters_to_ndarrays,
 )
+import logging
 
-class FedMRI(fl.server.strategy.FedAvg):
+logging.basicConfig(level=logging.INFO)
+
+class FedSNR(fl.server.strategy.FedAvg):
     def aggregate_fit(
         self,
         rnd: int,
@@ -35,7 +38,7 @@ class FedMRI(fl.server.strategy.FedAvg):
         # Custom aggregation logic
         aggregated_ndarrays = self.aggregate_inplace(results)
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
-        print("FedMRI Strategy")
+        logging.info(f"Aggregated parameters at round {rnd} using FedMRI strategy.")
         return parameters_aggregated, {}
     
     def aggregate_inplace(self, results: list[tuple[ClientProxy, FitRes]]) -> NDArrays:

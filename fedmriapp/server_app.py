@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor
 
 from fedmriapp.models.models import get_custom_model
-from fedmriapp.mristrategy.fed_mri import FedMRI
+from fedmriapp.mristrategy.fed_mri import FedSNR
 from fedmriapp.reproducibility.reproducible_strategy import make_strategy_reproducible
 #from fedmriapp.client_app import apply_transforms
 
@@ -30,6 +30,8 @@ result_file = f"{PATH}/{fl_config['strategy']}-C{fl_config['fitFraction']}-partC
 DATASET = fl_config['dataset']
 
 def init_results_file():
+    if not Path(PATH).exists():
+        Path(PATH).mkdir(parents=True, exist_ok=True)
     with open(result_file, "w") as f:
         f.write("round,loss,accuracy\n")
 
@@ -141,7 +143,7 @@ def server_fn(context: Context):
         evaluate_fn=get_evaluate_fn(testloader, device=device),
     )
     
-    strategyMRI = FedMRI(
+    strategyFedSNR = FedSNR(
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
@@ -152,8 +154,8 @@ def server_fn(context: Context):
     
     if fl_config["strategy"] == "FedAvg":
         strategy = strategyFedAvg
-    elif fl_config["strategy"] == "FedMRI":
-        strategy = strategyMRI
+    elif fl_config["strategy"] == "FedSNR":
+        strategy = strategyFedSNR
     else:
         raise ValueError(f"Invalid strategy: {fl_config['strategy']}")
     
