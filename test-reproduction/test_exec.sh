@@ -10,7 +10,7 @@ dataset=$3
 
 cd ..
 for fitFraction in 0.1 0.3 0.5 0.7; do
-    for strategy in FedAvg FedSNR; do
+    for strategy in FedProx FedAvg FedSNR; do
         for distribution in iid dirichlet; do
             for percentages in 0.0 0.2 0.5; do
                 
