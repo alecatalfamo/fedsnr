@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import json
 from flwr.server import ServerApp, ServerAppComponents, ServerConfig
 from flwr.common import Context, ndarrays_to_parameters, Metrics
-from flwr.server.strategy import FedAvg, FedProx
+from flwr.server.strategy import FedAvg, FedProx, FedAdam
 from datasets import load_dataset
 from pathlib import Path
 from collections import OrderedDict
@@ -160,6 +160,16 @@ def server_fn(context: Context):
         initial_parameters=parameters_param,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
         proximal_mu=0.01,
+    )
+    strategies['FedAdam'] = strategy = FedAdam(
+        fraction_fit=fl_config['fitFraction'],              # 80% dei client per round
+        fraction_evaluate=0,         # Tutti i client per evaluation        # Minimo client per continuare
+        min_available_clients=fl_config['fitClients'],
+        eta=0.01,                      # Server learning rate (prudente)
+        eta_l=0.01,                    # Local LR (se usi adaptive local)
+        beta_1=0.9,                    # Momentum primo ordine
+        beta_2=0.999,                  # Momento secondo ordine (conservativo)
+        tau=1e-8,                      # Stabilità numerica
     )
     
     try:
