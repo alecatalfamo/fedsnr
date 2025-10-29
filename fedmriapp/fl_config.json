@@ -6,10 +6,21 @@
     "splitPort": "5000",
     "portFl": "8080",
     "fitClients": 20,
-    "fitFraction": 0.1,
-    "strategy": "FedProx",
+    "fitFraction": 0.7,
+    "strategy": "FedSNR",
     "dataset": "alzheimer",
-    "distribution": "iid",
+    "distribution": "dirichlet",
     "strategySeed": 42,
-    "noisyClients": []
+    "noisyClients": [
+        3,
+        0,
+        8,
+        7,
+        16,
+        2,
+        11,
+        1,
+        10,
+        17
+    ]
 }
