@@ -161,15 +161,18 @@ def server_fn(context: Context):
         evaluate_fn=get_evaluate_fn(testloader, device=device),
         proximal_mu=0.01,
     )
-    strategies['FedAdam'] = strategy = FedAdam(
-        fraction_fit=fl_config['fitFraction'],              # 80% dei client per round
-        fraction_evaluate=0,         # Tutti i client per evaluation        # Minimo client per continuare
+    strategies['FedAdam'] = FedAdam(
+        fraction_fit=fl_config['fitFraction'],              
+        fraction_evaluate=0,         
         min_available_clients=fl_config['fitClients'],
-        eta=0.01,                      # Server learning rate (prudente)
-        eta_l=0.01,                    # Local LR (se usi adaptive local)
-        beta_1=0.9,                    # Momentum primo ordine
-        beta_2=0.999,                  # Momento secondo ordine (conservativo)
-        tau=1e-8,                      # Stabilità numerica
+        initial_parameters=parameters_param,
+        eta=0.01,                     
+        eta_l=0.01,                    
+        beta_1=0.9,                    
+        beta_2=0.999,                 
+        tau=1e-8,                      
+        evaluate_fn=get_evaluate_fn(testloader, device=device),
+        on_fit_config_fn=on_fit_config,
     )
     
     try:

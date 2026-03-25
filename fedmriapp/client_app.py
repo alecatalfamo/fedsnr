@@ -201,10 +201,11 @@ def client_fn(context: Context):
     set_all_seeds(42)
     mri_parameters = calculate_dataset_snr_cnr(trainloader)
     clientsClass = {}
-    clientsClass['FedAvg'] = clientsClass['FedSNR'] = FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
+    clientClassIndex = "FedProx" if fl_config['strategy'] == "FedProx" else "FedAvg"
+    clientsClass['FedAvg'] =  FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
     clientsClass['FedProx'] = FlowerProxClient (partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
     try:
-        client = clientsClass[fl_config['strategy']] 
+        client = clientsClass[clientClassIndex] 
     except KeyError:
         raise ValueError(f"Invalid Client respect to Strategy: {fl_config['strategy']}")
     
