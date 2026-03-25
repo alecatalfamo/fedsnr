@@ -5,3 +5,4 @@ test-reproduction/partitions*
 fedmriapp/results
 venv
 **/__pycache__/
+CLAUDE.md
