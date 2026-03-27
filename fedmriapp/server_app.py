@@ -13,19 +13,17 @@ from torchvision.transforms import ToTensor
 from fedmriapp.models.models import get_custom_model
 from fedmriapp.mristrategy.fed_mri import FedSNR
 from fedmriapp.reproducibility.reproducible_strategy import make_strategy_reproducible
-#from fedmriapp.client_app import apply_transforms
 
-#TESTSET_PATH = "./fedmriapp/testset/test"
 PATH = "./fedmriapp/results"
-
-#DATASET = 'alzheimer'
-#DATASET = 'braintumor'
 
 with open('fedmriapp/fl_config.json') as f:
     fl_config = json.load(f)
 
 percentages = len(fl_config['noisyClients']) / fl_config['fitClients']
-result_file = f"{PATH}/{fl_config['strategy']}-C{fl_config['fitFraction']}-partClients{fl_config['fitClients']}-dist-{fl_config['distribution']}-perc-{percentages}.csv"
+_server_strat = fl_config['serverStrategy']
+_client_strat = fl_config['clientStrategy']
+_strat_prefix = f"{_server_strat}-client-{_client_strat}" if _client_strat != _server_strat else _server_strat
+result_file = f"{PATH}/{_strat_prefix}-C{fl_config['fitFraction']}-partClients{fl_config['fitClients']}-dist-{fl_config['distribution']}-perc-{percentages}.csv"
 
 DATASET = fl_config['dataset']
 
@@ -87,7 +85,6 @@ class Grayscale:
 def apply_transforms(batch):
     """Apply transformations to the image batch."""    
     resize = Resize((208, 176)) if DATASET == 'alzheimer' else Resize((244, 244))
-    #resize = Resize((244, 244))
     grayscale = Grayscale()
     transforms = ToTensor()
 
@@ -99,13 +96,9 @@ def apply_transforms(batch):
 
 def get_testset():
     dataset_path = Path("./datasets/global_datasets/alzheimer_dataset") if DATASET == 'alzheimer' else Path("./datasets/global_datasets/brain-tumor-mri")
-    #dataset_path = Path("/home/fcr/client-mri/brain-tumor-mri")
     dataset = load_dataset('imagefolder', data_dir=dataset_path)
     test_dataset = dataset['test']
     return test_dataset
-
-# def get_weights(model):
-#     return [param.cpu().detach().numpy() for param in model.parameters()]
 
 def get_weights(model):
     list_params = []
@@ -139,8 +132,8 @@ def server_fn(context: Context):
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
-        on_fit_config_fn=on_fit_config,
         initial_parameters=parameters_param,
+        on_fit_config_fn=on_fit_config,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
     )
 
@@ -148,37 +141,37 @@ def server_fn(context: Context):
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
-        on_fit_config_fn=on_fit_config,
         initial_parameters=parameters_param,
+        on_fit_config_fn=on_fit_config,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
     )
     strategies['FedProx'] = FedProx(
         fraction_fit=fl_config["fitFraction"],
         fraction_evaluate=0,
         min_available_clients=fl_config["fitClients"],
-        on_fit_config_fn=on_fit_config,
         initial_parameters=parameters_param,
+        on_fit_config_fn=on_fit_config,
         evaluate_fn=get_evaluate_fn(testloader, device=device),
         proximal_mu=0.01,
     )
     strategies['FedAdam'] = FedAdam(
-        fraction_fit=fl_config['fitFraction'],              
-        fraction_evaluate=0,         
+        fraction_fit=fl_config['fitFraction'],
+        fraction_evaluate=0,
         min_available_clients=fl_config['fitClients'],
         initial_parameters=parameters_param,
-        eta=0.01,                     
-        eta_l=0.01,                    
-        beta_1=0.9,                    
-        beta_2=0.999,                 
-        tau=1e-8,                      
-        evaluate_fn=get_evaluate_fn(testloader, device=device),
         on_fit_config_fn=on_fit_config,
+        evaluate_fn=get_evaluate_fn(testloader, device=device),
+        eta=0.01,
+        eta_l=0.01,
+        beta_1=0.9,
+        beta_2=0.999,
+        tau=1e-8,
     )
     
     try:
-        strategy = strategies[fl_config["strategy"]]
+        strategy = strategies[fl_config["serverStrategy"]]
     except KeyError:
-        raise ValueError(f"Invalid strategy: {fl_config['strategy']}")
+        raise ValueError(f"Invalid server strategy: {fl_config['serverStrategy']}")
     
     strategy = make_strategy_reproducible(strategy, seed=fl_config["strategySeed"])
     
@@ -188,5 +181,3 @@ def server_fn(context: Context):
 
 init_results_file()
 app = ServerApp(server_fn=server_fn)
-
-

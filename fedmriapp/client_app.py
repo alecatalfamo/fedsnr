@@ -201,13 +201,13 @@ def client_fn(context: Context):
     set_all_seeds(42)
     mri_parameters = calculate_dataset_snr_cnr(trainloader)
     clientsClass = {}
-    clientClassIndex = "FedProx" if fl_config['strategy'] == "FedProx" else "FedAvg"
+    clientClassIndex = fl_config['clientStrategy']
     clientsClass['FedAvg'] =  FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
-    clientsClass['FedProx'] = FlowerProxClient (partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
+    clientsClass['FedProx'] = FlowerProxClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
     try:
-        client = clientsClass[clientClassIndex] 
+        client = clientsClass[clientClassIndex]
     except KeyError:
-        raise ValueError(f"Invalid Client respect to Strategy: {fl_config['strategy']}")
+        raise ValueError(f"Invalid client strategy: {fl_config['clientStrategy']}")
     
     # with open('fedmriapp/results/client_loaded.txt', 'a') as f:
     #     f.write(f"Client {partition_id} loaded\n")
