@@ -37,7 +37,7 @@ python3 partition-generator.py --type-partitions-provided [iid|dirichlet] --num-
 ## Partition Server
 Run the partition server to serve the generated partitions:
 ```bash
-python3 partition-server.py
+python3 server-partition.py
 ```
 
 ## Set pyproject.toml for GPU
@@ -45,8 +45,8 @@ Open the `fedmriapp/pyproject.toml` file and set the number of GPUs available fo
 If you don't have GPUs, set it to 0.
 ```toml
 [tool.flwr.federations.local-simulation-gpu]
-options.backend.client-resources.num-cpus = 1 # each ClientApp assumes to use 2CPUs
-options.backend.client-resources.num-gpus = <number_of_gpus> # at most 5 ClientApp will run in a given GPU
+options.backend.client-resources.num-cpus = 1
+options.backend.client-resources.num-gpus = <number_of_gpus> 
 ```
 
 ## Toml Supernodes configuration
@@ -58,13 +58,13 @@ Where N is 20 for the alzheimer dataset and 30 for the brain-tumor dataset.
 Even if during the partition generation you created 30 partitions for both datasets, alzheimer experiments do not exploit the whole dataset.
 
 ## Run Experiments
-In a new terminal, navigate to the `test-reproduction` folder and run the experiment script:
+Configure the config.ini file inside the `test-reproduction` folder with the desired parameters (e.g. strategy, dataset, distribution, etc.) and run the script:
 ```bash
-./test_exec.sh 42 20 alzheimer
+./exec-test.sh 42 30 brain-tumor
 ``` 
 
 ```bash
-./test_exec.sh 42 30 brain-tumor
+./exec-test.sh 42 20 alzheimer
 ``` 
 for the alzheimer dataset
  
