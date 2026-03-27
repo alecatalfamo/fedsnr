@@ -37,7 +37,7 @@ python3 partition-generator.py --type-partitions-provided [iid|dirichlet] --num-
 ## Partition Server
 Run the partition server to serve the generated partitions:
 ```bash
-python3 partition-server.py
+python3 server-partition.py
 ```
 
 ## Set pyproject.toml for GPU
