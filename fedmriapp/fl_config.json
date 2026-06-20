@@ -5,22 +5,29 @@
     "splitServer": "localhost",
     "splitPort": "5000",
     "portFl": "8080",
-    "fitClients": 20,
+    "fitClients": 30,
     "fitFraction": 0.7,
     "strategy": "FedSNR",
-    "dataset": "alzheimer",
+    "dataset": "brain-tumor",
     "distribution": "dirichlet",
     "strategySeed": 42,
     "noisyClients": [
+        20,
         3,
         0,
+        23,
         8,
         7,
-        16,
+        24,
+        4,
+        28,
+        17,
         2,
-        11,
+        18,
+        13,
         1,
-        10,
-        17
-    ]
+        27
+    ],
+    "serverStrategy": "FedProx",
+    "clientStrategy": "FedProx"
 }

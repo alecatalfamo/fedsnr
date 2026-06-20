@@ -28,6 +28,8 @@ def set_all_seeds(seed: int = 42):
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False 
 
 
 class CustomCNNLight(nn.Module):
@@ -96,6 +98,8 @@ class TorchModel(nn.Module):
     def __init__(self, input_shape=(244, 244, 1), num_classes=4, seed=42):
         super(TorchModel, self).__init__()
         
+        set_all_seeds(seed)
+        
         # In PyTorch, input shape is expected as (channels, height, width)
         # So we need to adapt from TF's (height, width, channels)
         in_channels = input_shape[2]
@@ -128,6 +132,9 @@ class TorchModel(nn.Module):
             nn.Linear(64, num_classes),
             #nn.Softmax(dim=1)
         )
+        
+        # Initialize weights with fixed seed
+        self._initialize_weights(seed)
     
     def _get_conv_output(self, shape):
         # Create a dummy input tensor
@@ -141,6 +148,17 @@ class TorchModel(nn.Module):
         output = self.features(dummy_input)
         n_size = output.data.view(1, -1).size(1)
         return n_size
+    
+    def _initialize_weights(self, seed: int):
+        set_all_seeds(seed)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.Linear):
+                nn.init.normal_(m.weight, 0, 0.01)
+                nn.init.constant_(m.bias, 0)
     
     def forward(self, x):
         # PyTorch uses (batch_size, channels, height, width) format
