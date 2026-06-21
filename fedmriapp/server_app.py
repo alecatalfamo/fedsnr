@@ -60,6 +60,7 @@ def get_evaluate_fn(testloader, device):
     def evaluate(server_round: int, parameters, config):
         model = get_custom_model()
         set_weights(model, parameters)
+        model.to(device)
         loss, accuracy = test(model, testloader, device)
         
         with open(result_file, "a") as f:

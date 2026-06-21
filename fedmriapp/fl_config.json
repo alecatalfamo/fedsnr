@@ -11,18 +11,7 @@
     "dataset": "alzheimer",
     "distribution": "iid",
     "strategySeed": 42,
-    "noisyClients": [
-        3,
-        0,
-        8,
-        7,
-        16,
-        2,
-        11,
-        1,
-        10,
-        17
-    ],
+    "noisyClients": [],
     "serverStrategy": "FedSNR",
     "clientStrategy": "FedSNR",
     "forceEvalCPU": true
