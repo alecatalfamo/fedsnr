@@ -41,7 +41,7 @@ PORT_FLASK = 5000
 FOLDER = Path(os.getcwd() + '/partitions')
 # DATASET = 'alzheimer'
 #DATASET = 'braintumor'
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu" if fl_config.get("forceCPU", False) else ("cuda" if torch.cuda.is_available() else "cpu")
 
 with open('fedmriapp/fl_config.json') as fl_config_file:
     fl_config = json.load(fl_config_file)
@@ -202,8 +202,8 @@ def client_fn(context: Context):
     mri_parameters = calculate_dataset_snr_cnr(trainloader)
     clientsClass = {}
     clientClassIndex = fl_config['clientStrategy']
-    clientsClass['FedAvg'] =  FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
-    clientsClass['FedProx'] = FlowerProxClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
+    clientsClass['FedAvg'] =  FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, device=device).to_client()
+    clientsClass['FedProx'] = FlowerProxClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01, device=device).to_client()
     # FedSNR e FedAdam differiscono solo lato server (aggregazione); il client si comporta come FedAvg
     clientsClass['FedSNR'] = clientsClass['FedAvg']
     clientsClass['FedAdam'] = clientsClass['FedAvg']

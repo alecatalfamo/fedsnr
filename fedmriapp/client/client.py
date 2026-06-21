@@ -30,18 +30,17 @@ def set_all_seeds(seed: int = 42):
 
 
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, learning_rate, dataloader):
+    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, learning_rate, dataloader, device=None):
         self.client_id = client_id
         set_all_seeds(42)
         self.model = model
         self.learning_rate = learning_rate
         self.train_data = dataloader
-        #print("Train data", self.train_data)
         self.mean_snr = float(mean_snr)
         self.num_epochs = epochs
         self.criterion = criterion
         self.optimizer = optimizer
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = device if device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
  
     def get_parameters(self):
         return self.model.get_weights()
@@ -119,7 +118,7 @@ class FlowerClient(fl.client.NumPyClient):
 
 
 class FlowerProxClient(fl.client.NumPyClient):
-    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, learning_rate, dataloader, mu=0.1):
+    def __init__(self, client_id, model, epochs, mean_snr, criterion, optimizer, learning_rate, dataloader, mu=0.1, device=None):
         self.client_id = client_id
         set_all_seeds(42)
         self.model = model
@@ -129,9 +128,9 @@ class FlowerProxClient(fl.client.NumPyClient):
         self.num_epochs = epochs
         self.criterion = criterion
         self.optimizer = optimizer
-        self.mu = mu  # Parametro prossimale FedProx
-        self.global_model = None  # Modello globale di riferimento
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.mu = mu
+        self.global_model = None
+        self.device = device if device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
  
     def get_parameters(self):
         return self.model.get_weights()

@@ -113,7 +113,7 @@ def set_weights(model, parameters):
     model.load_state_dict(state_dict, strict=True)
 
 def server_fn(context: Context):
-    if fl_config.get("forceEvalCPU", False):
+    if fl_config.get("forceCPU", False):
         device = torch.device("cpu")
     else:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
