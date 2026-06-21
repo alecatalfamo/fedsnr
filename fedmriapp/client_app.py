@@ -204,6 +204,9 @@ def client_fn(context: Context):
     clientClassIndex = fl_config['clientStrategy']
     clientsClass['FedAvg'] =  FlowerClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader).to_client()
     clientsClass['FedProx'] = FlowerProxClient(partition_id, net, client_config['epochs'], mri_parameters[0], criterion, optimizer, client_config['learning_rate'], trainloader, mu=0.01).to_client()
+    # FedSNR e FedAdam differiscono solo lato server (aggregazione); il client si comporta come FedAvg
+    clientsClass['FedSNR'] = clientsClass['FedAvg']
+    clientsClass['FedAdam'] = clientsClass['FedAvg']
     try:
         client = clientsClass[clientClassIndex]
     except KeyError:

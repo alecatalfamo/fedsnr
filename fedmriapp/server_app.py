@@ -23,7 +23,7 @@ percentages = len(fl_config['noisyClients']) / fl_config['fitClients']
 _server_strat = fl_config['serverStrategy']
 _client_strat = fl_config['clientStrategy']
 _strat_prefix = f"{_server_strat}-client-{_client_strat}" if _client_strat != _server_strat else _server_strat
-result_file = f"{PATH}/{_strat_prefix}-C{fl_config['fitFraction']}-partClients{fl_config['fitClients']}-dist-{fl_config['distribution']}-perc-{percentages}.csv"
+result_file = f"{PATH}/{_strat_prefix}-C{fl_config['fitFraction']}-partClients{fl_config['fitClients']}-dist-{fl_config['distribution']}-perc-{percentages}-seed-{fl_config['strategySeed']}.csv"
 
 DATASET = fl_config['dataset']
 

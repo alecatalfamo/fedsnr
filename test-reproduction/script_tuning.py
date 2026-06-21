@@ -19,6 +19,7 @@ def modify_json(input_file, output_file, fitFraction, server_strategy, client_st
     data['distribution'] = distribution
     data['fitClients'] = fit_clients
     data['dataset'] = dataset
+    data['strategySeed'] = seed
 
     list_noise_clients = rng.sample(range(0, data['fitClients']), int(data['fitClients'] * percentage_noisy_clients))
     data['noisyClients'] = list_noise_clients
