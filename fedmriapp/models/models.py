@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import json
@@ -23,13 +24,17 @@ def set_all_seeds(seed: int = 42):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    torch.set_num_threads(1)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         torch.backends.cuda.matmul.allow_tf32 = False
-        torch.backends.cudnn.allow_tf32 = False 
+        torch.backends.cudnn.allow_tf32 = False
+    os.environ['OMP_NUM_THREADS'] = '1'
+    os.environ['MKL_NUM_THREADS'] = '1'
+    os.environ['OPENBLAS_NUM_THREADS'] = '1'
 
 
 class CustomCNNLight(nn.Module):
