@@ -2,6 +2,13 @@
 # Deve essere eseguito dalla cartella test-reproduction/
 dataset=$1
 
+# Forza thread singolo per riproducibilità cross-machine
+# (deve essere settato prima dell'avvio di Python/OMP)
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_THREADING_LAYER=sequential
+
 # Funzione per leggere valori da file INI
 read_config() {
     local key=$1

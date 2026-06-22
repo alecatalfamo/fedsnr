@@ -27,6 +27,7 @@ def set_all_seeds(seed: int = 42):
     # PyTorch
     torch.manual_seed(seed)
     torch.set_num_threads(1)
+    torch.use_deterministic_algorithms(True)
     # CUDA
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
