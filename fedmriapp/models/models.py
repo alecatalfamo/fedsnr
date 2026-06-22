@@ -191,7 +191,7 @@ def get_custom_model(seed: int = 42):
         model = CustomCNNLight(seed=seed) if fl_config['dataset'] == 'alzheimer' else TorchModel(seed=seed)
         
         # Move to device
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu" if fl_config.get("forceCPU", False) else ("cuda" if torch.cuda.is_available() else "cpu")
         model = model.to(device)
         
         logger.info(f"Successfully created custom model with seed {seed}")

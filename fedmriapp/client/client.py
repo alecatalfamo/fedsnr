@@ -57,6 +57,7 @@ class FlowerClient(fl.client.NumPyClient):
     
     def fit(self, parameters, config):
         self.set_parameters(parameters)
+        self.model.to(self.device)
         set_all_seeds(42)
         self.train(self.model)
         
@@ -149,9 +150,11 @@ class FlowerProxClient(fl.client.NumPyClient):
         # Salva i parametri globali per il termine prossimale
         self.global_model = deepcopy(self.model)
         self.set_parameters(self.global_model, parameters)
-        
+        self.global_model.to(self.device)
+
         # Imposta i parametri nel modello locale
         self.set_parameters(self.model, parameters)
+        self.model.to(self.device)
         set_all_seeds(42)
         self.train_fedprox(self.model)
         
