@@ -29,6 +29,7 @@ def set_all_seeds(seed: int = 42):
     torch.set_num_threads(1)
     torch.use_deterministic_algorithms(True)
     torch.backends.mkldnn.enabled = False
+    torch.backends.nnpack.enabled = False
     # CUDA
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
@@ -40,6 +41,8 @@ def set_all_seeds(seed: int = 42):
     os.environ['OMP_NUM_THREADS'] = '1'
     os.environ['MKL_NUM_THREADS'] = '1'
     os.environ['OPENBLAS_NUM_THREADS'] = '1'
+    os.environ['MKL_CBWR'] = 'COMPATIBLE'
+    os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
 
 # Set global configuration
 SERVER_SPLIT = 'localhost'

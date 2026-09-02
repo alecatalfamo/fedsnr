@@ -14,10 +14,10 @@ from fedmriapp.models.models import get_custom_model
 from fedmriapp.mristrategy.fed_mri import FedSNR
 from fedmriapp.reproducibility.reproducible_strategy import make_strategy_reproducible
 
-PATH = "./fedmriapp/results"
-
 with open('fedmriapp/fl_config.json') as f:
     fl_config = json.load(f)
+
+PATH = f"./fedmriapp/results/{fl_config['dataset']}"
 
 percentages = len(fl_config['noisyClients']) / fl_config['fitClients']
 _server_strat = fl_config['serverStrategy']
